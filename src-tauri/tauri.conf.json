@@ -1,0 +1,55 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "FoldMark",
+  "version": "0.1.0",
+  "identifier": "com.yanzy.foldmark",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:4173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "FoldMark",
+        "width": 1180,
+        "height": 800,
+        "minWidth": 760,
+        "minHeight": 560,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src ipc: http://ipc.localhost; frame-src 'self' data: blob:",
+      "devCsp": "default-src 'self' http://localhost:4173; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline' http://localhost:4173; script-src 'self' http://localhost:4173; connect-src ipc: http://ipc.localhost ws://localhost:4173 http://localhost:4173; frame-src 'self' data: blob:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Productivity",
+    "shortDescription": "轻量 Markdown 阅读器",
+    "longDescription": "FoldMark 是一款本地优先、只读、安全的轻量 Markdown 阅读器。",
+    "fileAssociations": [
+      {
+        "ext": ["md", "markdown"],
+        "name": "Markdown 文档",
+        "description": "Markdown 文档",
+        "role": "Viewer",
+        "mimeType": "text/markdown",
+        "rank": "Alternate"
+      }
+    ]
+  }
+}
