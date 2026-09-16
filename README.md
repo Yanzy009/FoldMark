@@ -50,7 +50,7 @@ macOS 正式对外分发还需要 Developer ID 签名与 Apple 公证；Windows 
 
 ## 发布状态
 
-当前版本为 `0.1.0` 产品化候选版。源码层功能和自动构建基础已经建立；签名、公证及 Windows 10/11 实机体验属于正式发布前的外部验收门槛。详见 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) 与 [WINDOWS_TEST.md](WINDOWS_TEST.md)。
+当前版本为 `0.1.1` 产品化候选版。源码层功能和自动构建基础已经建立；签名、公证及 Windows 10/11 实机体验属于正式发布前的外部验收门槛。详见 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) 与 [WINDOWS_TEST.md](WINDOWS_TEST.md)。
 
 ## 项目边界
 

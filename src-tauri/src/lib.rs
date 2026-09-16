@@ -64,12 +64,20 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("failed to build FoldMark")
         .run(|app, event| {
-            if let tauri::RunEvent::Opened { urls } = event {
-                let paths = urls
-                    .into_iter()
-                    .filter_map(|url| url.to_file_path().ok())
-                    .collect();
-                signal_pending_paths(app, paths);
+            #[cfg(target_os = "macos")]
+            {
+                if let tauri::RunEvent::Opened { urls } = event {
+                    let paths = urls
+                        .into_iter()
+                        .filter_map(|url| url.to_file_path().ok())
+                        .collect();
+                    signal_pending_paths(app, paths);
+                }
+            }
+
+            #[cfg(not(target_os = "macos"))]
+            {
+                let _ = (app, event);
             }
         });
 }
