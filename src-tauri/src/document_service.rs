@@ -28,6 +28,7 @@ struct DocumentGrant {
 
 #[derive(Clone, Debug)]
 struct LibraryGrant {
+    root: PathBuf,
     documents: HashMap<String, PathBuf>,
 }
 
@@ -570,6 +571,7 @@ pub async fn choose_document_library(
     libraries.insert(
         token.clone(),
         LibraryGrant {
+            root,
             documents: scan.grants,
         },
     );
@@ -579,6 +581,47 @@ pub async fn choose_document_library(
         documents: scan.documents,
         truncated: scan.truncated,
     }))
+}
+
+#[tauri::command]
+pub fn refresh_document_library(
+    library_token: String,
+    state: State<'_, AppState>,
+) -> Result<LibraryPayload, String> {
+    // Clone the authorized root before scanning so a large library never holds
+    // the shared state lock while walking the file system.
+    let root = state
+        .libraries
+        .lock()
+        .map_err(|_| "文档库授权状态不可用".to_string())?
+        .get(&library_token)
+        .map(|library| library.root.clone())
+        .ok_or_else(|| "文档库授权已失效，请重新选择文件夹".to_string())?;
+
+    let scan = scan_library(&root)?;
+    let name = root
+        .file_name()
+        .and_then(|value| value.to_str())
+        .unwrap_or("Markdown 文档库")
+        .to_string();
+    let documents = scan.documents;
+    let truncated = scan.truncated;
+
+    let mut libraries = state
+        .libraries
+        .lock()
+        .map_err(|_| "文档库授权状态不可用".to_string())?;
+    let library = libraries
+        .get_mut(&library_token)
+        .ok_or_else(|| "文档库授权已失效，请重新选择文件夹".to_string())?;
+    library.documents = scan.grants;
+
+    Ok(LibraryPayload {
+        token: library_token,
+        name,
+        documents,
+        truncated,
+    })
 }
 
 #[tauri::command]

@@ -1,8 +1,35 @@
-# FoldMark
+<p align="center">
+  <img src="docs/assets/foldmark-icon.png" width="112" alt="FoldMark 应用图标">
+</p>
 
-轻量、专注、本地优先的 Markdown 阅读器。
+<h1 align="center">FoldMark</h1>
+
+<p align="center"><strong>轻量、专注、本地优先的 Markdown 阅读器</strong></p>
+
+<p align="center">
+  <img alt="Platform" src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-5b7fe8">
+  <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24c8db">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-3eb476">
+</p>
 
 FoldMark 面向“打开后安静阅读”这一件事：极简的方式，把表格、代码、Mermaid 流程图与长文档目录做成适合持续阅读的桌面体验。
+
+## 界面预览
+
+![FoldMark 主阅读界面：文档库、目录联动与表格阅读](docs/assets/foldmark-reader.png)
+
+<p align="center"><sub>可折叠文档库 · 目录跟随高亮 · GFM 表格</sub></p>
+
+![FoldMark Mermaid 流程图与代码阅读](docs/assets/foldmark-mermaid.png)
+
+<p align="center"><sub>Mermaid 缩放与适宽 · 代码高亮 · 平滑章节导航</sub></p>
+
+## 为什么是 FoldMark
+
+- **纯阅读**：没有编辑器、打印和导出工具带来的视觉干扰；
+- **本地优先**：文档只在当前设备解析，不上传内容；
+- **长文档友好**：目录联动、平滑高亮、阅读位置恢复和文内搜索；
+- **复杂内容友好**：表格可全屏，Mermaid 可缩放拖动，代码可高亮复制。
 
 ## 功能
 
@@ -11,7 +38,8 @@ FoldMark 面向“打开后安静阅读”这一件事：极简的方式，把�
 - 代码高亮与复制，表格独立滚动和全屏阅读；
 - H1–H6 自动目录、正文联动与平滑气泡高亮；
 - 多标签、文内搜索、阅读位置恢复、深浅主题和阅读偏好；
-- 最近文档、文件夹文档库、Finder/资源管理器拖放；
+- 可独立折叠的文件夹文档库、最近文档与文档目录；
+- 文档库一键重新扫描，以及 Finder/资源管理器拖放；
 - macOS / Windows 文件关联、双击打开和单实例文件转交；
 - UTF-8、UTF-8 BOM、GBK/GB18030 中文文档；
 - 同目录本地图片与 Markdown 链接的受限只读访问。
@@ -38,7 +66,7 @@ cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 npm audit --omit=dev
 ```
 
-`fixtures/` 中保留两份可公开的人工回归文档：安全降级检查和外部保存自动刷新检查。
+`fixtures/` 中保留可公开的人工回归与界面演示文档，用于安全降级、外部保存自动刷新和主要阅读能力检查。
 
 本机构建安装包：
 

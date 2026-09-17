@@ -6,6 +6,7 @@ import { centeredTocScrollTarget } from './tocNavigation'
 import appIconUrl from '../src-tauri/icons/128x128@2x.png'
 
 type Theme = 'light' | 'dark'
+type SidebarSection = 'library' | 'recent' | 'toc'
 
 type DocumentPayload = {
   token: string
@@ -58,6 +59,7 @@ type ReaderTab = {
 
 const THEME_STORAGE_KEY = 'markdown-reader.theme'
 const READING_PREFERENCES_STORAGE_KEY = 'markdown-reader.reading-preferences'
+const SIDEBAR_SECTIONS_STORAGE_KEY = 'markdown-reader.sidebar-sections'
 const LARGE_DOCUMENT_BYTES = 2 * 1024 * 1024
 function initialTheme(): Theme {
   try {
@@ -81,6 +83,20 @@ function initialReadingPreferences(): ReadingPreferences {
   }
 }
 
+function initialCollapsedSections(): Record<SidebarSection, boolean> {
+  const defaults = { library: false, recent: false, toc: false }
+  try {
+    const stored = JSON.parse(localStorage.getItem(SIDEBAR_SECTIONS_STORAGE_KEY) ?? '{}') as Partial<Record<SidebarSection, unknown>>
+    return {
+      library: typeof stored.library === 'boolean' ? stored.library : defaults.library,
+      recent: typeof stored.recent === 'boolean' ? stored.recent : defaults.recent,
+      toc: typeof stored.toc === 'boolean' ? stored.toc : defaults.toc,
+    }
+  } catch {
+    return defaults
+  }
+}
+
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -98,6 +114,7 @@ export default function App() {
   const [readingPreferences, setReadingPreferences] = useState<ReadingPreferences>(initialReadingPreferences)
   const [readingSettingsOpen, setReadingSettingsOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 820)
+  const [collapsedSections, setCollapsedSections] = useState(initialCollapsedSections)
   const [notice, setNotice] = useState('')
   const [isChoosingDocument, setIsChoosingDocument] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -107,6 +124,7 @@ export default function App() {
   const [library, setLibrary] = useState<LibraryPayload | null>(null)
   const [libraryQuery, setLibraryQuery] = useState('')
   const [isChoosingLibrary, setIsChoosingLibrary] = useState(false)
+  const [isRefreshingLibrary, setIsRefreshingLibrary] = useState(false)
   const [isDraggingDocument, setIsDraggingDocument] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
   const searchInput = useRef<HTMLInputElement>(null)
@@ -149,6 +167,14 @@ export default function App() {
   useEffect(() => {
     void refreshRecentDocuments()
   }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_SECTIONS_STORAGE_KEY, JSON.stringify(collapsedSections))
+    } catch {
+      // Section controls still work when local persistence is unavailable.
+    }
+  }, [collapsedSections])
 
   useEffect(() => {
     if (!('__TAURI_INTERNALS__' in window)) return
@@ -696,6 +722,26 @@ export default function App() {
     }
   }
 
+  async function refreshLibrary() {
+    if (!library || isRefreshingLibrary || !('__TAURI_INTERNALS__' in window)) return
+    setIsRefreshingLibrary(true)
+    setNotice(`正在刷新文档库“${library.name}”…`)
+    try {
+      const { invoke } = await import('@tauri-apps/api/core')
+      const refreshed = await invoke<LibraryPayload>('refresh_document_library', { libraryToken: library.token })
+      setLibrary(refreshed)
+      setNotice(`文档库已刷新 · ${refreshed.documents.length} 个 Markdown 文件${refreshed.truncated ? '（已达到 2000 项安全上限）' : ''}`)
+    } catch (error) {
+      setNotice(`刷新失败：${error instanceof Error ? error.message : String(error)}`)
+    } finally {
+      setIsRefreshingLibrary(false)
+    }
+  }
+
+  function toggleSidebarSection(section: SidebarSection) {
+    setCollapsedSections((current) => ({ ...current, [section]: !current[section] }))
+  }
+
   async function openLibraryDocument(documentId: string) {
     if (!library) return
     setNotice('正在从文档库安全打开文件…')
@@ -880,82 +926,113 @@ export default function App() {
 
       <div className={`workspace ${sidebarOpen ? '' : 'sidebar-collapsed'} ${tabs.length === 0 ? 'without-tabs' : ''}`}>
         <aside className="sidebar">
-          <section className="document-library" aria-label="文档库">
+          <section className={`sidebar-section document-library ${collapsedSections.library ? 'is-collapsed' : ''}`} aria-label="文件夹文档库">
             <div className="library-header">
-              <strong>{library?.name ?? 'Markdown 文档库'}</strong>
-              <button type="button" disabled={isChoosingLibrary} onClick={() => void chooseLibrary()}>
-                {isChoosingLibrary ? '等待…' : library ? '更换' : '选择文件夹'}
+              <button className="section-toggle" type="button" onClick={() => toggleSidebarSection('library')} aria-expanded={!collapsedSections.library}>
+                <span className="section-chevron" aria-hidden="true">›</span>
+                <strong>{library?.name ?? '文件夹文档库'}</strong>
+                {library && <small>{library.documents.length} 项</small>}
+              </button>
+              <div className="library-actions">
+                {library && (
+                  <button className={`refresh-library ${isRefreshingLibrary ? 'is-refreshing' : ''}`} type="button" disabled={isRefreshingLibrary || isChoosingLibrary} onClick={() => void refreshLibrary()} aria-label="刷新文档库" title="重新扫描文件夹">
+                    ↻
+                  </button>
+                )}
+                <button type="button" disabled={isChoosingLibrary || isRefreshingLibrary} onClick={() => void chooseLibrary()}>
+                  {isChoosingLibrary ? '等待…' : library ? '更换' : '选择文件夹'}
+                </button>
+              </div>
+            </div>
+            <div className="section-collapse" aria-hidden={collapsedSections.library}>
+              <div className="section-collapse-inner">
+                {library && (
+                  <>
+                    <input
+                      type="search"
+                      value={libraryQuery}
+                      placeholder={`筛选 ${library.documents.length} 个文档`}
+                      aria-label="筛选文档库"
+                      onChange={(event) => setLibraryQuery(event.target.value)}
+                    />
+                    <div className="library-list">
+                      {visibleLibraryDocuments.map((document) => (
+                        <button type="button" key={document.id} title={document.relativePath} onClick={() => void openLibraryDocument(document.id)}>
+                          <strong>{document.name}</strong>
+                          <span>{document.relativePath}</span>
+                        </button>
+                      ))}
+                      {visibleLibraryDocuments.length === 0 && <span className="library-empty">没有匹配的 Markdown 文件</span>}
+                    </div>
+                    {library.documents.length > visibleLibraryDocuments.length && !libraryQuery && (
+                      <small className="library-limit">先显示前 200 项，可输入关键词筛选</small>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </section>
+          <section className={`sidebar-section recent-documents ${collapsedSections.recent ? 'is-collapsed' : ''}`} aria-label="最近文件">
+            <div className="sidebar-heading">
+              <button className="section-toggle" type="button" onClick={() => toggleSidebarSection('recent')} aria-expanded={!collapsedSections.recent}>
+                <span className="section-chevron" aria-hidden="true">›</span>
+                <strong>最近文件</strong>
+                <small>{recentDocuments.length} 项</small>
               </button>
             </div>
-            {library && (
-              <>
-                <input
-                  type="search"
-                  value={libraryQuery}
-                  placeholder={`筛选 ${library.documents.length} 个文档`}
-                  aria-label="筛选文档库"
-                  onChange={(event) => setLibraryQuery(event.target.value)}
-                />
-                <div className="library-list">
-                  {visibleLibraryDocuments.map((document) => (
-                    <button type="button" key={document.id} title={document.relativePath} onClick={() => void openLibraryDocument(document.id)}>
+            <div className="section-collapse" aria-hidden={collapsedSections.recent}>
+              <div className="section-collapse-inner">
+                <div className="recent-list">
+                  {recentDocuments.map((document) => (
+                    <button type="button" key={document.id} title={document.displayPath} onClick={() => void reopenRecentDocument(document.id)}>
                       <strong>{document.name}</strong>
-                      <span>{document.relativePath}</span>
+                      <span>{document.displayPath.slice(0, -(document.name.length + 1))}</span>
                     </button>
                   ))}
-                  {visibleLibraryDocuments.length === 0 && <span className="library-empty">没有匹配的 Markdown 文件</span>}
+                  {recentDocuments.length === 0 && <span className="sidebar-empty">暂无最近文件</span>}
                 </div>
-                {library.documents.length > visibleLibraryDocuments.length && !libraryQuery && (
-                  <small className="library-limit">先显示前 200 项，可输入关键词筛选</small>
-                )}
-              </>
-            )}
+              </div>
+            </div>
           </section>
-          {recentDocuments.length > 0 && (
-            <section className="recent-documents" aria-label="最近文件">
-              <div className="sidebar-heading">
-                <span>最近文件</span>
-                <small>{recentDocuments.length} 项</small>
-              </div>
-              <div className="recent-list">
-                {recentDocuments.map((document) => (
-                  <button type="button" key={document.id} title={document.displayPath} onClick={() => void reopenRecentDocument(document.id)}>
-                    <strong>{document.name}</strong>
-                    <span>{document.displayPath.slice(0, -(document.name.length + 1))}</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-          <div className="sidebar-heading">
-            <span>文档目录</span>
-            <small>{toc.length} 项</small>
-          </div>
-          <nav
-            ref={tocNavigation}
-            className="toc"
-            aria-label="文档目录"
-            onWheel={pauseTocAutoFollow}
-            onPointerDown={(event) => {
-              if (!(event.target as Element).closest('button')) pauseTocAutoFollow()
-            }}
-            onTouchStart={(event) => {
-              if (!(event.target as Element).closest('button')) pauseTocAutoFollow()
-            }}
-          >
-            <div ref={tocHighlightBubble} className="toc-highlight-bubble" aria-hidden="true"><span /></div>
-            {toc.map((item, index) => (
-              <button
-                type="button"
-                key={`${item.id}-${index}`}
-                className={`toc-level-${item.level}`}
-                data-toc-index={index}
-                onClick={() => jumpTo(item.id, index)}
-              >
-                {item.text}
+          <section className={`sidebar-section toc-section ${collapsedSections.toc ? 'is-collapsed' : ''}`} aria-label="文档目录">
+            <div className="sidebar-heading">
+              <button className="section-toggle" type="button" onClick={() => toggleSidebarSection('toc')} aria-expanded={!collapsedSections.toc}>
+                <span className="section-chevron" aria-hidden="true">›</span>
+                <strong>文档目录</strong>
+                <small>{toc.length} 项</small>
               </button>
-            ))}
-          </nav>
+            </div>
+            <div className="section-collapse" aria-hidden={collapsedSections.toc}>
+              <div className="section-collapse-inner toc-collapse-inner">
+                <nav
+                  ref={tocNavigation}
+                  className="toc"
+                  aria-label="文档目录"
+                  onWheel={pauseTocAutoFollow}
+                  onPointerDown={(event) => {
+                    if (!(event.target as Element).closest('button')) pauseTocAutoFollow()
+                  }}
+                  onTouchStart={(event) => {
+                    if (!(event.target as Element).closest('button')) pauseTocAutoFollow()
+                  }}
+                >
+                  <div ref={tocHighlightBubble} className="toc-highlight-bubble" aria-hidden="true"><span /></div>
+                  {toc.map((item, index) => (
+                    <button
+                      type="button"
+                      key={`${item.id}-${index}`}
+                      className={`toc-level-${item.level}`}
+                      data-toc-index={index}
+                      onClick={() => jumpTo(item.id, index)}
+                    >
+                      {item.text}
+                    </button>
+                  ))}
+                  {toc.length === 0 && <span className="sidebar-empty">当前文档没有标题</span>}
+                </nav>
+              </div>
+            </div>
+          </section>
           <div className="privacy-note"><span>●</span> 文件只在当前设备解析</div>
         </aside>
 

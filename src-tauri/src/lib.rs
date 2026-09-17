@@ -4,7 +4,7 @@ use document_service::{
     choose_document_library, choose_markdown_document, close_document, list_recent_documents,
     open_dropped_document, open_library_document, open_linked_document, open_pending_documents,
     open_recent_document, queue_markdown_paths, read_document_asset, read_markdown_document,
-    AppState,
+    refresh_document_library, AppState,
 };
 use std::path::{Path, PathBuf};
 use tauri::{Emitter, Manager};
@@ -44,6 +44,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             choose_markdown_document,
             choose_document_library,
+            refresh_document_library,
             close_document,
             list_recent_documents,
             open_recent_document,

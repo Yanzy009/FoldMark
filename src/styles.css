@@ -153,12 +153,27 @@ button { color: inherit; }
   overflow: hidden;
   transition: opacity .15s;
 }
+.sidebar-section { flex: 0 0 auto; min-height: 0; }
 .document-library { padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: color-mix(in srgb, var(--surface) 72%, transparent); }
 .library-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.library-header strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-.library-header button { flex: 0 0 auto; padding: 4px 7px; border: 1px solid var(--border); border-radius: 5px; color: var(--accent-strong); background: var(--surface); cursor: pointer; font-size: 9px; }
-.document-library > input { width: 100%; height: 28px; margin-top: 8px; padding: 0 8px; border: 1px solid var(--border); border-radius: 6px; outline: 0; color: var(--text); background: var(--surface); font-size: 10px; }
-.document-library > input:focus { border-color: var(--accent); }
+.library-header > .section-toggle { min-width: 0; }
+.library-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 4px; }
+.library-actions button { min-width: 27px; height: 27px; padding: 0 7px; border: 1px solid var(--border); border-radius: 6px; color: var(--accent-strong); background: var(--surface); cursor: pointer; font-size: 9px; }
+.library-actions button:disabled { opacity: .48; cursor: default; }
+.library-actions .refresh-library { padding: 0; font-size: 16px; line-height: 1; }
+.refresh-library.is-refreshing { animation: refresh-spin .8s linear infinite; }
+.section-collapse { display: grid; grid-template-rows: minmax(0, 1fr); opacity: 1; transition: grid-template-rows 300ms cubic-bezier(.22,.78,.24,1), opacity 180ms ease, margin 300ms cubic-bezier(.22,.78,.24,1); }
+.section-collapse-inner { min-height: 0; overflow: hidden; }
+.sidebar-section.is-collapsed .section-collapse { grid-template-rows: minmax(0, 0fr); opacity: 0; pointer-events: none; }
+.section-toggle { min-width: 0; display: flex; flex: 1; align-items: center; gap: 6px; padding: 3px 2px; border: 0; color: var(--muted); background: transparent; cursor: pointer; text-align: left; }
+.section-toggle strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: inherit; font-size: 11px; font-weight: 700; letter-spacing: .05em; }
+.section-toggle small { flex: 0 0 auto; margin-left: auto; font-size: 9px; font-weight: 500; letter-spacing: 0; }
+.section-chevron { flex: 0 0 auto; display: inline-grid; width: 11px; place-items: center; font-size: 18px; line-height: 1; transform: rotate(90deg); transition: transform 260ms cubic-bezier(.22,.78,.24,1); }
+.is-collapsed .section-chevron { transform: rotate(0deg); }
+.document-library .section-collapse { margin-top: 5px; }
+.document-library.is-collapsed .section-collapse { margin-top: 0; }
+.document-library input { width: 100%; height: 28px; padding: 0 8px; border: 1px solid var(--border); border-radius: 6px; outline: 0; color: var(--text); background: var(--surface); font-size: 10px; }
+.document-library input:focus { border-color: var(--accent); }
 .library-list { max-height: 170px; margin-top: 6px; overflow: auto; }
 .library-list button { width: 100%; display: block; padding: 6px 5px; border: 0; border-radius: 5px; color: var(--muted); background: transparent; text-align: left; cursor: pointer; }
 .library-list button:hover { background: var(--accent-soft); }
@@ -166,15 +181,19 @@ button { color: inherit; }
 .library-list strong { color: var(--text); font-size: 10px; }
 .library-list span { margin-top: 2px; font-size: 8px; }
 .library-empty, .library-limit { display: block; padding: 7px 4px 1px; color: var(--muted); font-size: 9px; }
-.sidebar-heading { display: flex; justify-content: space-between; margin: 24px 9px 9px; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em; }
-.sidebar-heading small { font-weight: 500; letter-spacing: 0; }
-.recent-documents .sidebar-heading { margin-top: 17px; }
+.sidebar-heading { display: flex; justify-content: space-between; margin: 14px 7px 5px; color: var(--muted); }
+.recent-documents .sidebar-heading { margin-top: 12px; }
 .recent-list { max-height: 150px; overflow: auto; }
 .recent-list button { width: 100%; display: block; padding: 7px 9px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; text-align: left; cursor: pointer; }
 .recent-list button:hover { color: var(--accent-strong); background: var(--accent-soft); }
 .recent-list strong, .recent-list span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recent-list strong { color: var(--text); font-size: 11px; font-weight: 600; }
 .recent-list span { margin-top: 2px; font-size: 9px; }
+.sidebar-empty { display: block; padding: 9px; color: var(--muted); font-size: 9px; }
+.toc-section { flex: 1 1 auto; display: flex; flex-direction: column; transition: flex-grow 300ms cubic-bezier(.22,.78,.24,1); }
+.toc-section.is-collapsed { flex: 0 0 auto; }
+.toc-section .section-collapse { min-height: 0; flex: 1 1 auto; }
+.toc-collapse-inner { display: flex; flex-direction: column; }
 .toc { min-height: 0; flex: 1; position: relative; overflow: auto; padding-right: 2px; }
 .toc-highlight-bubble { position: absolute; top: 0; left: 0; z-index: 0; width: calc(100% - 2px); pointer-events: none; opacity: 0; will-change: transform, height, opacity; }
 .toc-highlight-bubble.is-ready { transition: transform 410ms cubic-bezier(.18,.88,.22,1), height 320ms cubic-bezier(.18,.82,.22,1), opacity 160ms ease; }
@@ -203,6 +222,8 @@ button { color: inherit; }
 .toc-level-4 { padding-left: 42px !important; font-size: 11px !important; }
 .privacy-note { padding: 11px 10px 3px; border-top: 1px solid var(--border); color: var(--muted); font-size: 10px; }
 .privacy-note span { color: #3eb476; margin-right: 5px; }
+
+@keyframes refresh-spin { to { transform: rotate(360deg); } }
 
 .reader-scroll { overflow: auto; scroll-behavior: smooth; }
 .empty-reader {
@@ -359,4 +380,6 @@ button { color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .toc-highlight-bubble.is-ready { transition: none; }
+  .section-collapse, .section-chevron, .toc-section { transition: none; }
+  .refresh-library.is-refreshing { animation: none; }
 }
