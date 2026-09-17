@@ -502,8 +502,10 @@ fn scan_library(root: &Path) -> Result<LibraryScan, String> {
             let relative_path = canonical
                 .strip_prefix(root)
                 .map_err(|_| "文档库文件超出授权范围".to_string())?
-                .to_string_lossy()
-                .into_owned();
+                .components()
+                .map(|component| component.as_os_str().to_string_lossy())
+                .collect::<Vec<_>>()
+                .join("/");
             let id = Uuid::new_v4().to_string();
             documents.push(LibraryDocument {
                 id: id.clone(),
