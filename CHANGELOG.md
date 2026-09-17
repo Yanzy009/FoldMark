@@ -2,6 +2,12 @@
 
 本项目遵循语义化版本。正式发行前的变化记录在 `Unreleased`。
 
+## 0.1.4 - 2026-09-17
+
+### 修复
+
+- Windows 自动发布改用 Tauri 官方支持的 NSIS 安装包，避开 WiX `light.exe` 偶发失败，确保 macOS 与 Windows 构建可以稳定同时完成。
+
 ## 0.1.3 - 2026-09-17
 
 ### 修复
@@ -24,7 +30,7 @@
 - 最近文档、文件夹文档库、大文件性能模式与文件自动刷新；
 - macOS / Windows 文件关联、双击启动、单实例文件转交；
 - UTF-8、GBK/GB18030 中文编码和受限本地 Markdown 链接；
-- macOS Universal、Windows NSIS/MSI 的 GitHub Actions 构建流程。
+- macOS Universal、Windows NSIS 的 GitHub Actions 构建流程。
 
 ### 安全
 

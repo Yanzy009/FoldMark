@@ -46,11 +46,11 @@ npm audit --omit=dev
 npm run desktop:build
 ```
 
-macOS 正式对外分发还需要 Developer ID 签名与 Apple 公证；Windows 正式发布建议进行代码签名。推送 `v*` 标签后，仓库中的 GitHub Actions 会生成 macOS Universal 与 Windows NSIS/MSI 草稿发行包。
+推送 `v*` 标签后，仓库中的 GitHub Actions 会同时生成支持 Apple Silicon 与 Intel 的 macOS Universal DMG，以及 Windows x64 NSIS 安装包。当前安装包未进行商业代码签名，首次打开时 macOS Gatekeeper 或 Windows SmartScreen 可能要求用户手动确认。
 
 ## 发布状态
 
-当前版本为 `0.1.3` 产品化候选版。源码层功能和自动构建基础已经建立；签名、公证及 Windows 10/11 实机体验属于正式发布前的外部验收门槛。详见 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) 与 [WINDOWS_TEST.md](WINDOWS_TEST.md)。
+当前公开版本为 `0.1.4`。macOS 与 Windows 安装包均由 GitHub Actions 在官方托管环境中从同一版本标签自动构建，便于用户下载，也便于维护者复现发行过程。安装与实机验收方法详见 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) 与 [WINDOWS_TEST.md](WINDOWS_TEST.md)。
 
 ## 项目边界
 

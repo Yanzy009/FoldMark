@@ -30,7 +30,7 @@
 
 ## Windows 正式发行
 
-- [ ] GitHub Actions 成功生成 NSIS `.exe` 与 WiX `.msi`
+- [ ] GitHub Actions 成功生成 NSIS `.exe` 安装包
 - [ ] 在干净的 Windows 10、Windows 11 各安装一次
 - [ ] WebView2 缺失时安装器能自动补齐；已有环境不重复干扰
 - [ ] 中文排版、文件关联、Mermaid、拖放、升级和卸载通过
@@ -42,4 +42,3 @@
 - [ ] 版本号、Git tag、CHANGELOG 三者一致
 - [ ] 草稿 Release 中的安装包、校验值和发行说明完整
 - [ ] 在新设备复验安装包后，再将 Release 从 prerelease 改为正式发布
-
