@@ -36,7 +36,20 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: FoldMark v__VERSION__
-          releaseBody: 请参阅仓库中的 CHANGELOG 与发布验收记录。
-          releaseDraft: true
-          prerelease: true
+          releaseBody: |
+            FoldMark 是一款轻量、本地优先的 Markdown 阅读器。
+
+            ## 下载
+
+            - macOS：下载 `universal.dmg`，同时支持 Apple Silicon 与 Intel Mac。
+            - Windows：下载 `x64-setup.exe`，适用于 64 位 Windows。
+            - `Source code` 是供开发者使用的源码，普通用户不需要下载。
+
+            ## 首次打开
+
+            当前安装包未进行商业代码签名。macOS 如果拦截，请在 Finder 中右键应用并选择“打开”；Windows 如出现 SmartScreen，请确认下载来源为本仓库后选择“仍要运行”。
+
+            详细变更请参阅仓库中的 CHANGELOG。
+          releaseDraft: false
+          prerelease: false
           args: ${{ matrix.args }}

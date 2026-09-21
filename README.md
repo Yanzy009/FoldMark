@@ -12,7 +12,27 @@
   <img alt="License" src="https://img.shields.io/badge/license-MIT-3eb476">
 </p>
 
+<p align="center">
+  <a href="https://github.com/Yanzy009/FoldMark/releases/download/v0.1.5/FoldMark_0.1.5_universal.dmg"><img alt="下载 macOS 版" src="https://img.shields.io/badge/下载-macOS%20Universal-1473e6?style=for-the-badge&logo=apple&logoColor=white"></a>
+  <a href="https://github.com/Yanzy009/FoldMark/releases/download/v0.1.5/FoldMark_0.1.5_x64-setup.exe"><img alt="下载 Windows 版" src="https://img.shields.io/badge/下载-Windows%20x64-1473e6?style=for-the-badge&logo=windows11&logoColor=white"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Yanzy009/FoldMark/releases/latest">查看最新版本与全部下载</a>
+</p>
+
 FoldMark 面向“打开后安静阅读”这一件事：极简的方式，把表格、代码、Mermaid 流程图与长文档目录做成适合持续阅读的桌面体验。
+
+## 下载与安装
+
+| 系统 | 安装包 | 适用设备 |
+| --- | --- | --- |
+| macOS | [`FoldMark_0.1.5_universal.dmg`](https://github.com/Yanzy009/FoldMark/releases/download/v0.1.5/FoldMark_0.1.5_universal.dmg) | Apple Silicon 与 Intel Mac |
+| Windows | [`FoldMark_0.1.5_x64-setup.exe`](https://github.com/Yanzy009/FoldMark/releases/download/v0.1.5/FoldMark_0.1.5_x64-setup.exe) | 64 位 Windows 10 / 11 |
+
+> 请下载 `.dmg` 或 `.exe` 安装包。GitHub 页面中的 `Source code (zip)` 和 `Source code (tar.gz)` 是供开发者使用的源码，不是可直接安装的软件。
+
+当前安装包尚未进行商业代码签名。macOS 首次打开如被 Gatekeeper 拦截，请在 Finder 中右键 FoldMark 并选择“打开”；Windows 如出现 SmartScreen 提示，请确认下载来源是本 GitHub 仓库后选择“更多信息 → 仍要运行”。
 
 ## 界面预览
 
@@ -78,7 +98,7 @@ npm run desktop:build
 
 ## 发布状态
 
-当前公开版本为 `0.1.4`。macOS 与 Windows 安装包均由 GitHub Actions 在官方托管环境中从同一版本标签自动构建，便于用户下载，也便于维护者复现发行过程。安装与实机验收方法详见 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) 与 [WINDOWS_TEST.md](WINDOWS_TEST.md)。
+当前公开版本为 `0.1.5`。macOS 与 Windows 安装包均由 GitHub Actions 在官方托管环境中从同一版本标签自动构建，并自动创建正式公开的 Release。安装与实机验收方法详见 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) 与 [WINDOWS_TEST.md](WINDOWS_TEST.md)。
 
 ## 项目边界
 

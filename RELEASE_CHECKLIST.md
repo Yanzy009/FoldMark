@@ -40,5 +40,7 @@
 
 - [ ] README 截图、功能说明、安装说明和隐私说明完成
 - [ ] 版本号、Git tag、CHANGELOG 三者一致
-- [ ] 草稿 Release 中的安装包、校验值和发行说明完整
-- [ ] 在新设备复验安装包后，再将 Release 从 prerelease 改为正式发布
+- [ ] 推送 `v*` 标签后，Release 自动作为正式版本公开
+- [ ] Release Assets 同时包含 macOS `universal.dmg` 和 Windows `x64-setup.exe`
+- [ ] 从 README 顶部的两个下载按钮分别完成安装包下载
+- [ ] 在新设备上复验安装、首次启动、文件关联与卸载
